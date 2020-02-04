@@ -1,16 +1,18 @@
 #!/bin/bash
 #SBATCH -J qm_descriptors
 #SBATCH -p medium
-#SBATCH --time=24:00:00
+#SBATCH --time=20:00:00
 #SBATCH --ntasks=40
 #SBATCH --mem-per-cpu=2G
 #SBATCH -N 1
 
-PATH=$CONDA_PYTHON_PATH:$PATH:$NBOPATH
-PYTHONPATH=$CONDA_PACKAGE_PATH:$PYTHONPATH
+source activate QM_descriptors
 
-g16root=$G16_ROOT
-GAUSS_SCRDIR=$SCRATH_FOLDER
+PATH=/home/ranasd01/.conda/envs/QM_descriptors/bin/python:$PATH:/home/ranasd01/Software/nbo6/bin
+PYTHONPATH=/home/ranasd01/.conda/envs/QM_descriptors/lib/python3.7/site-packages/:$PYTHONPATH
+
+g16root=/gpfs/apps/medsci/stacks/noOS/software/gaussian/g16.c01.avx2
+GAUSS_SCRDIR=/gpfs/scratch/jobs/ranasd01/
 export g16root GAUSS_SCRDIR
 . $g16root/g16/bsd/g16.profile
 
