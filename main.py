@@ -9,8 +9,8 @@ from lib import csearch
 from lib import xtb_optimization
 from lib import dft_scf
 
-XTB_PATH = '$GFN_XTB_PATH'
-G16_PATH = '$G16_PATH'
+XTB_PATH = '/home/ranasd01/Software/xtb_6.2.2/bin'
+G16_PATH = '/gpfs/apps/medsci/stacks/noOS/software/gaussian/g16.c01.avx2/g16'
 
 parser = ArgumentParser()
 parser.add_argument('--ismiles', type=str, required=False,
