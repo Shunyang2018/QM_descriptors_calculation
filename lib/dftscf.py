@@ -21,7 +21,7 @@ def _summarize_descriptors(QM_descriptors):
     # spin density
     for spin in ['mulliken_spin_density', 'hirshfeld_spin_density']:
         QM_descriptor_return['{}_plus1'.format(spin)] = QM_descriptors['plus1'][spin]
-        QM_descriptor_return['{}_minus1'.format(charge)] = QM_descriptors['minus1'][spin]
+        QM_descriptor_return['{}_minus1'.format(spin)] = QM_descriptors['minus1'][spin]
 
     # SCF
     QM_descriptor_return['SCF_plus1'] = QM_descriptors['plus1']['SCF']
