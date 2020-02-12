@@ -17,9 +17,6 @@ parser.add_argument('--ismiles', type=str, required=False,
                     help='input smiles included in a .csv file')
 parser.add_argument('--output', type=str, default='QM_descriptors.pickle',
                     help='output as a .pickle file')
-parser.add_argument('--timeout', type=int, default=600,
-                    help='time window for xtb optimization and dft calculation, this is to prevent workflow stuck'
-                         'for a single molecule')
 # conformer searching
 parser.add_argument('--MMFF_conf_folder', type=str, default='MMFF_conf',
                     help='folder for MMFF searched conformers')
@@ -74,7 +71,7 @@ for conf_sdf in conf_sdfs:
     try:
         shutil.copyfile(os.path.join(args.MMFF_conf_folder, conf_sdf),
                         os.path.join(args.xtb_folder, conf_sdf))
-        opt_sdf = xtb_optimization(args.xtb_folder, conf_sdf, XTB_PATH, logger)
+        opt_sdf = xtb_optimization(args.xtb_folder, conf_sdf, XTB_PATH, logger, args.timeout)
         opt_sdfs.append(opt_sdf)
     except Exception as e:
         logger.error('XTB optimization for {} failed: {}'.format(os.path.splitext(conf_sdf)[0], e))
@@ -89,7 +86,7 @@ for opt_sdf in opt_sdfs:
         shutil.copyfile(os.path.join(args.xtb_folder, opt_sdf),
                         os.path.join(args.DFT_folder, opt_sdf))
         qm_descriptor = dft_scf(args.DFT_folder, opt_sdf, G16_PATH, args.DFT_theory, args.DFT_n_procs,
-                                logger)
+                                logger, args.timeout)
         qm_descriptors.append(qm_descriptor)
     except Exception as e:
         logger.error('Gaussian optimization for {} failed: {}'.format(os.path.splitext(opt_sdf)[0], e))
