@@ -17,6 +17,9 @@ parser.add_argument('--ismiles', type=str, required=False,
                     help='input smiles included in a .csv file')
 parser.add_argument('--output', type=str, default='QM_descriptors.pickle',
                     help='output as a .pickle file')
+parser.add_argument('--timeout', type=int, default=600,
+                    help='time window for xtb optimization and dft calculation, this is to prevent workflow stuck'
+                         'for a single molecule')
 # conformer searching
 parser.add_argument('--MMFF_conf_folder', type=str, default='MMFF_conf',
                     help='folder for MMFF searched conformers')

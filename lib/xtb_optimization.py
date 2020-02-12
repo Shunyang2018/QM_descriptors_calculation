@@ -8,26 +8,27 @@ import numpy as np
 from .g16_log import XtbLog
 
 
-def xtb_optimization(folder, sdf, xtb_path, logger):
+def xtb_optimization(folder, sdf, xtb_path, logger, timeout=600):
     basename = os.path.basename(sdf)
+    file_name = os.path.splitext(basename)[0]
+
+    if os.path.isfile(os.path.join(folder, '{}_freq.log')):
+        return '{}_opt.sdf'.format(file_name)
 
     pwd = os.getcwd()
-
     os.chdir(folder)
     try:
-        file_name = os.path.splitext(basename)[0]
-
         xtb_command = os.path.join(xtb_path, 'xtb')
         with open('{}_xtb_opt.log'.format(file_name), 'w') as out:
             print(xtb_command, '{}.sdf'.format(file_name))
-            subprocess.call([xtb_command, '{}.sdf'.format(file_name), '-opt'],
-                            stdout=out, stderr=out)
+            subprocess.call('{} {}_opt.sdf -opt'.format(xtb_command, file_name),
+                            stdout=out, stderr=out, timeout=timeout)
             shutil.move('xtbopt.sdf', '{}_opt.sdf'.format(file_name))
             os.remove('{}.sdf'.format(file_name))
 
         with open(file_name + '_freq.log', 'w') as out:
-            subprocess.call([xtb_command, '{}_opt.sdf'.format(file_name), '-ohess'], stdout=out,
-                            stderr=out)
+            subprocess.run('{} {}_opt.sdf -ohess'.format(xtb_command, file_name), stdout=out,
+                           stderr=out, timeout=timeout)
 
             os.remove('hessian')
             os.remove('vibspectrum')

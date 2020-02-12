@@ -147,7 +147,14 @@ def csearch(supp, total, args, logger):
     conf_sdfs = []
     with futures.ProcessPoolExecutor(max_workers=args.MMFF_threads) as executor:
         n_tasks = args.MMFF_threads if args.MMFF_threads < total else total
-        tasks = [genConf(next(supp), args) for m in range(n_tasks)]
+        tasks = []
+        while len(tasks) < n_tasks:
+            sup = next(supp)
+            if os.path.isfile('{}.sdf'.format(sup[0])):
+                continue
+
+            tasks.append(genConf(sup, args))
+
         running_pool = {task.name: executor.submit(task) for task in tasks}
 
         while True:
@@ -177,7 +184,13 @@ def csearch(supp, total, args, logger):
                     del(running_pool[mol_id])
                     
                     try:
-                        task = genConf(next(supp), args)
+                        task = None
+                        while task is None:
+                            sup = next(supp)
+                            if os.path.isfile('{}.sdf'.format(sup[0])):
+                                continue
+                            else:
+                                task = genConf(sup, args)
                     except StopIteration:
                         # reach end of the supp
                         logger.info('MMFF conformer searching finished')
