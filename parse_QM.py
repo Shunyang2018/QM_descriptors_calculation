@@ -8,20 +8,15 @@ from lib import read_log, _summarize_descriptors
 
 mols_groups = [os.path.join(x, 'DFT') for x in os.listdir('.') if os.path.isdir(x)]
 
-df = []
-for mols_group in mols_groups:
-
 def grab_from_mol_group(mols_group):
-    neutral_logs = [os.path.join(mols_group, 'neutral', x) for x in
-                    os.listdir(os.path.join(mols_group, 'neutral')) if '.log' in x]
+    logs = [x for x in os.listdir(os.path.join(mols_group, 'neutral')) if '.log' in x]
 
     QM_descs = []
-    for log_f in neutral_logs:
-        QM = read_log(log_f)
+    for log_f in logs:
+        QM = read_log(os.path.join(mols_group, 'neutral', log_f))
 
         if QM:
             desc_temp = {'neutral': QM}
-
             if os.path.isfile(os.path.join(mols_group, 'plus1', log_f)) and \
                     os.path.isfile(os.path.join(mols_group, 'minus1', log_f)):
 
