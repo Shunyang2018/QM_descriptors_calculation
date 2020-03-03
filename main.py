@@ -33,7 +33,7 @@ parser.add_argument('--E_cutoff', type=float, required=False, default=10.0,
                     help='energy window for MMFF minimization')
 parser.add_argument('--MMFF_threads', type=int, required=False, default=40,
                     help='number of process for the MMFF conformer searching')
-parser.add_argument('--timeout', required=False, type=int, default=600,
+parser.add_argument('--timeout', required=False, type=int, default=900,
                     help='time window for each MMFF conformer searching sub process')
 # xtb optimization
 parser.add_argument('--xtb_folder', type=str, default='XTB_opt',
@@ -87,7 +87,11 @@ for opt_sdf in opt_sdfs:
                         os.path.join(args.DFT_folder, opt_sdf))
         qm_descriptor = dft_scf(args.DFT_folder, opt_sdf, G16_PATH, args.DFT_theory, args.DFT_n_procs,
                                 logger, args.timeout)
-        qm_descriptors.append(qm_descriptor)
+        if qm_descriptor is not None:
+            qm_descriptors.append(qm_descriptor)
+        else:
+            logger.error('QM calculation taking too long, skip for {}'.format(os.path.splitext(opt_sdf)[0]))
+
     except Exception as e:
         logger.error('Gaussian optimization for {} failed: {}'.format(os.path.splitext(opt_sdf)[0], e))
 

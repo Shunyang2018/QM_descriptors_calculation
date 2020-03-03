@@ -21,7 +21,7 @@ def _summarize_descriptors(QM_descriptors):
     # spin density
     for spin in ['mulliken_spin_density', 'hirshfeld_spin_density']:
         QM_descriptor_return['{}_plus1'.format(spin)] = QM_descriptors['plus1'][spin]
-        QM_descriptor_return['{}_minus1'.format(charge)] = QM_descriptors['minus1'][spin]
+        QM_descriptor_return['{}_minus1'.format(spin)] = QM_descriptors['minus1'][spin]
 
     # SCF
     QM_descriptor_return['SCF_plus1'] = QM_descriptors['plus1']['SCF']
@@ -41,13 +41,18 @@ def dft_scf(folder, sdf, g16_path, level_of_theory, n_procs, logger, timeout=600
         for jobtype in ['neutral', 'plus1', 'minus1']:
             QM_descriptors[jobtype] = read_log(os.path.join(folder, jobtype, file_name + '.log'))
 
-        QM_descriptor_return = _summarize_descriptors(QM_descriptors)
-
-        return QM_descriptor_return
+        try:
+            QM_descriptor_return = _summarize_descriptors(QM_descriptors)
+        except:
+            pass
+        else:
+            os.remove(os.path.join(folder, file_name + '.sdf'))
+            return QM_descriptor_return
 
     parent_folder = os.getcwd()
     os.chdir(folder)
 
+    QM_descriptor_return = None
     try:
 
         xyz = mol2xyz(Chem.SDMolSupplier(sdf, removeHs=False, sanitize=False)[0])

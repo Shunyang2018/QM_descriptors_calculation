@@ -7,6 +7,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from concurrent import futures
 import os
+import time
 
 
 # algorithm to generate nc conformations
@@ -82,14 +83,23 @@ class genConf:
 
         self.process.start()
         self.process.join(self.timeout)
+
+        self.terminate()
+
         if 'return' in self.return_dict:
             return self.return_dict['return']
         else:
-            self.terminate()
             return (None, None, None)
 
     def terminate(self):
-        self.process.terminate()
+        self.done = True
+        try:
+            self.process.close()
+        except:
+            self.process.kill()
+            self.process.terminate()
+            time.sleep(2)
+            self.process.close()
 
 
 # filter conformers based on relative energy
@@ -148,12 +158,16 @@ def csearch(supp, total, args, logger):
     with futures.ProcessPoolExecutor(max_workers=args.MMFF_threads) as executor:
         n_tasks = args.MMFF_threads if args.MMFF_threads < total else total
         tasks = []
-        while len(tasks) < n_tasks:
-            sup = next(supp)
-            if os.path.isfile('{}.sdf'.format(sup[0])):
-                continue
-
-            tasks.append(genConf(sup, args))
+        try:
+            while len(tasks) < n_tasks:
+                sup = next(supp)
+                if os.path.isfile(os.path.join(args.MMFF_conf_folder, '{}.sdf'.format(sup[0]))):
+                    conf_sdfs.append('{}.sdf'.format(sup[0]))
+                    continue
+                tasks.append(genConf(sup, args))
+        except StopIteration:
+            if len(tasks) == 0:
+                return conf_sdfs
 
         running_pool = {task.name: executor.submit(task) for task in tasks}
 
@@ -187,7 +201,7 @@ def csearch(supp, total, args, logger):
                         task = None
                         while task is None:
                             sup = next(supp)
-                            if os.path.isfile('{}.sdf'.format(sup[0])):
+                            if os.path.isfile(os.path.join(args.MMFF_conf_folder, '{}.sdf'.format(sup[0]))):
                                 continue
                             else:
                                 task = genConf(sup, args)
