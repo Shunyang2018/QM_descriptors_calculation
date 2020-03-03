@@ -33,7 +33,7 @@ parser.add_argument('--E_cutoff', type=float, required=False, default=10.0,
                     help='energy window for MMFF minimization')
 parser.add_argument('--MMFF_threads', type=int, required=False, default=40,
                     help='number of process for the MMFF conformer searching')
-parser.add_argument('--timeout', required=False, default=600,
+parser.add_argument('--timeout', required=False, type=int, default=600,
                     help='time window for each MMFF conformer searching sub process')
 # xtb optimization
 parser.add_argument('--xtb_folder', type=str, default='XTB_opt',
