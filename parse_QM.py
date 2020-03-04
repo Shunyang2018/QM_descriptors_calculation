@@ -13,7 +13,10 @@ def grab_from_mol_group(mols_group):
 
     QM_descs = []
     for log_f in logs:
-        QM = read_log(os.path.join(mols_group, 'neutral', log_f))
+        try:
+            QM = read_log(os.path.join(mols_group, 'neutral', log_f))
+        except:
+            continue
 
         if QM:
             desc_temp = {'neutral': QM}
