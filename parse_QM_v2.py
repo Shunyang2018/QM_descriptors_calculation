@@ -4,13 +4,14 @@ import sys
 import pandas as pd
 
 from lib import read_log, _summarize_descriptors
+from tqdm import tqdm
 
 
 def grab_from_mol_group(mols_group):
     logs = [x for x in os.listdir(os.path.join(mols_group, 'neutral')) if '.log' in x]
 
     QM_descs = []
-    for log_f in logs:
+    for log_f in tqdm(logs):
         try:
             QM = read_log(os.path.join(mols_group, 'neutral', log_f))
         except:
