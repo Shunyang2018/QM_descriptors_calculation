@@ -21,7 +21,7 @@ def elementID(massno):
 
 
 class G16Log:
-    def __init__(self, file):
+    def __init__(self, file, QM_desc=True):
         # default values for thermochemical calculations
         if '.log' not in file:
             raise TypeError('A g16 .log file must be provided')
@@ -33,17 +33,18 @@ class G16Log:
         if not self.termination:
             self.GetError()
         else:
-            self.GetChargeMult()
-            self.GetCoords()
-            self.GetNPA()
+            if QM_desc:
+                self.GetChargeMult()
+                self.GetCoords()
+                self.GetNPA()
+                self.GetFreq()
+                self.GetG()
+                self.GetSCF()
+                self.GetMulliken()
+                self.GetNMR()
+                self.GetHirshfeld()
+                self.GetHOMOLUMO()
             self.GetCPU()
-            self.GetFreq()
-            self.GetG()
-            self.GetSCF()
-            self.GetMulliken()
-            self.GetNMR()
-            self.GetHirshfeld()
-            self.GetHOMOLUMO()
 
     def GetTermination(self):
         with open(self.file) as fh:
